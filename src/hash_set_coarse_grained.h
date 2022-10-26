@@ -27,6 +27,17 @@ class HashSetCoarseGrained : public HashSetBase<T> {
       b.push_back(elem);
       setSize_++;
     }
+    if (static_cast<u_long>(setSize_) / table_.size() > 4) {
+      u_long oldCapacity = table_.size();
+      u_long newCapacity = 2 * oldCapacity;
+      std::vector<std::vector<T>> oldTable = table_;
+      table_.resize(newCapacity);
+      for (auto bucket: oldTable) {
+        for (auto x: bucket) {
+          table_[hashCode_(x) % table_.size()].push_back(x);
+        }
+      }
+    }
     return true;
   }
 
